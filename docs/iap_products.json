@@ -1,0 +1,6 @@
+{
+  "app": "CoachBoard",
+  "package": "com.CoachBoardMNG.CoachBoard",
+  "config": "https://api2.blwsmartware.net/N249.json",
+  "products": ["cb_pack_1", "cb_pack_2", "cb_pack_3", "cb_pack_4", "cb_pack_5", "cb_pack_6", "cb_pack_7", "cb_pack_8", "cb_pack_9", "cb_pack_10", "cb_remove_ads"]
+}
