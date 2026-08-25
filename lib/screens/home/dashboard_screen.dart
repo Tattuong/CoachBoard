@@ -39,14 +39,6 @@ class DashboardScreen extends StatelessWidget {
               const CoinBalanceChip(variant: CoinChipVariant.header),
             ],
           ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(Icons.cloud_off_rounded, size: 14, color: AppColors.brand(context)),
-              const SizedBox(width: 6),
-              Text(AppStrings.t(context, 'offlineMode'), style: TextStyle(color: AppColors.brand(context), fontWeight: FontWeight.w800, fontSize: 12)),
-            ],
-          ),
           const SizedBox(height: 12),
           Text(hello, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           Text('You’ve got a strong day ahead.', style: TextStyle(color: AppColors.muted(context))),

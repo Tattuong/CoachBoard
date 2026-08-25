@@ -23,7 +23,15 @@ class ClientsScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(
               children: [
-                Expanded(child: Text(AppStrings.t(context, 'navClients'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800))),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(AppStrings.t(context, 'navClients'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+                      Text(AppStrings.t(context, 'swipeToDelete'), style: TextStyle(color: AppColors.muted(context), fontSize: 12, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
                 IconButton(
                   onPressed: () async {
                     if (board.clients.length >= board.clientCap) {
@@ -50,23 +58,57 @@ class ClientsScreen extends StatelessWidget {
                     separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (_, i) {
                       final c = board.clients[i];
-                      return NeonCard(
-                        onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => ClientWorkspaceScreen(clientId: c.id))),
-                        child: Row(
-                          children: [
-                            CircleAvatar(backgroundColor: AppColors.brandSoft(context), foregroundColor: AppColors.brand(context), child: Text(c.initials, style: const TextStyle(fontWeight: FontWeight.w900))),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(c.name, style: const TextStyle(fontWeight: FontWeight.w800)),
-                                  Text(c.goal, style: TextStyle(color: AppColors.muted(context), fontSize: 12)),
-                                ],
+                      return Dismissible(
+                        key: ValueKey(c.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(Icons.delete_outline_rounded, color: AppColors.error),
+                        ),
+                        confirmDismiss: (_) async {
+                          return await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text(AppStrings.t(ctx, 'deleteClientTitle')),
+                                  content: Text(AppStrings.t(ctx, 'deleteClientConfirm', {'name': c.name})),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx, false),
+                                      child: Text(AppStrings.t(ctx, 'cancel')),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      child: Text(AppStrings.t(ctx, 'delete')),
+                                    ),
+                                  ],
+                                ),
+                              ) ??
+                              false;
+                        },
+                        onDismissed: (_) => board.deleteClient(c.id),
+                        child: NeonCard(
+                          onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => ClientWorkspaceScreen(clientId: c.id))),
+                          child: Row(
+                            children: [
+                              CircleAvatar(backgroundColor: AppColors.brandSoft(context), foregroundColor: AppColors.brand(context), child: Text(c.initials, style: const TextStyle(fontWeight: FontWeight.w900))),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(c.name, style: const TextStyle(fontWeight: FontWeight.w800)),
+                                    Text(c.goal, style: TextStyle(color: AppColors.muted(context), fontSize: 12)),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Icon(Icons.chevron_right_rounded, color: AppColors.muted(context)),
-                          ],
+                              Icon(Icons.chevron_right_rounded, color: AppColors.muted(context)),
+                            ],
+                          ),
                         ),
                       );
                     },

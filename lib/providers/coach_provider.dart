@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 
 import '../core/calc/coach_math.dart';
 import '../core/services/storage_service.dart';
-import '../data/coach_catalog.dart';
 import '../models/coach_models.dart';
 import 'shop_provider.dart';
 
@@ -35,10 +34,6 @@ class CoachProvider extends ChangeNotifier {
     _initialized = true;
     onboardingComplete = await StorageService.instance.getBool(_onboardKey) ?? false;
     await _load();
-    if (clients.isEmpty && sessions.isEmpty) {
-      _seed();
-      await _save();
-    }
     _startTicker();
     notifyListeners();
   }
@@ -283,100 +278,6 @@ class CoachProvider extends ChangeNotifier {
 
   String _day(DateTime dt) =>
       '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-
-  void _seed() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    clients = [
-      Athlete(
-        id: 'c-alex',
-        name: 'Alex R.',
-        nickname: 'Alex',
-        goal: 'Build Muscle',
-        notes: 'Sleep 7h. Keep bench path tight. Not medical advice — log only.',
-        measures: [
-          MeasureLog(at: today.subtract(const Duration(days: 28)), weightLb: 178.2),
-          MeasureLog(at: today.subtract(const Duration(days: 14)), weightLb: 179.4),
-          MeasureLog(at: today.subtract(const Duration(days: 2)), weightLb: 180.6),
-        ],
-      ),
-      const Athlete(id: 'c-mia', name: 'Mia Chen', nickname: 'Mia', goal: 'Get Stronger'),
-      const Athlete(id: 'c-jon', name: 'Jordan P.', nickname: 'JP', goal: 'Stay Active'),
-    ];
-    sessions = [
-      TrainingSession(
-        id: 's-1',
-        clientId: 'c-alex',
-        at: today.add(const Duration(hours: 7)),
-        title: 'Push Day',
-        attended: true,
-        elapsedSec: 34 * 60 + 27,
-        lifts: const [
-          LiftLine(exercise: 'Barbell Bench Press', sets: 4, reps: 6, weightLb: 155),
-          LiftLine(exercise: 'Incline Dumbbell Press', sets: 3, reps: 8, weightLb: 50),
-          LiftLine(exercise: 'Overhead Press', sets: 3, reps: 8, weightLb: 85),
-        ],
-      ),
-      TrainingSession(
-        id: 's-2',
-        clientId: 'c-mia',
-        at: today.add(const Duration(hours: 9)),
-        title: 'Lower',
-        attended: true,
-      ),
-      TrainingSession(
-        id: 's-3',
-        clientId: 'c-jon',
-        at: today.add(const Duration(hours: 18)),
-        title: 'Full body',
-      ),
-    ];
-    // Backfill attended sessions this month for 19/22
-    for (var i = 0; i < 19; i++) {
-      sessions = [
-        ...sessions,
-        TrainingSession(
-          id: 's-past-$i',
-          clientId: i.isEven ? 'c-alex' : 'c-mia',
-          at: today.subtract(Duration(days: 1 + i)),
-          title: 'Session',
-          attended: true,
-        ),
-      ];
-    }
-    for (var i = 0; i < 3; i++) {
-      sessions = [
-        ...sessions,
-        TrainingSession(
-          id: 's-miss-$i',
-          clientId: 'c-jon',
-          at: today.subtract(Duration(days: 4 + i)),
-          title: 'Session',
-        ),
-      ];
-    }
-    programs = [
-      ProgramPlan(
-        id: 'p-push',
-        name: '4-Day Strength',
-        days: [
-          ProgramDay(name: 'Push Day', lifts: CoachCatalog.exercises.take(3).map((e) => LiftLine(exercise: e.name)).toList()),
-          const ProgramDay(name: 'Pull Day', lifts: [LiftLine(exercise: 'Barbell Row'), LiftLine(exercise: 'Lat Pulldown')]),
-          const ProgramDay(name: 'Legs', lifts: [LiftLine(exercise: 'Back Squat'), LiftLine(exercise: 'Romanian Deadlift')]),
-          const ProgramDay(name: 'Conditioning', lifts: [LiftLine(exercise: 'Plank', sets: 3, reps: 45)]),
-        ],
-      ),
-    ];
-    packs = const [
-      SessionPack(id: 'k-alex', clientId: 'c-alex', total: 12, used: 5, price: 720),
-    ];
-    payments = [
-      Payment(id: 'pay-1', clientId: 'c-alex', amount: 4250, status: PayStatus.collected, at: today.subtract(const Duration(days: 2))),
-      Payment(id: 'pay-2', clientId: 'c-mia', amount: 750, status: PayStatus.pending, at: today),
-      Payment(id: 'pay-3', clientId: 'c-jon', amount: 200, status: PayStatus.overdue, at: today.subtract(const Duration(days: 10))),
-    ];
-    activeSessionId = 's-1';
-  }
 
   @override
   void dispose() {

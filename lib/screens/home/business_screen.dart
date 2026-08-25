@@ -23,12 +23,6 @@ class BusinessScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
         children: [
           Text(AppStrings.t(context, 'planBusiness'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 4),
-          Row(children: [
-            Icon(Icons.cloud_off_rounded, size: 14, color: AppColors.brand(context)),
-            const SizedBox(width: 6),
-            Text(AppStrings.t(context, 'offlineMode'), style: TextStyle(color: AppColors.brand(context), fontWeight: FontWeight.w800, fontSize: 12)),
-          ]),
           const SizedBox(height: 14),
           GridView.count(
             crossAxisCount: 2,
